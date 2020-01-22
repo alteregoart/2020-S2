@@ -1,7 +1,5 @@
-<p style="text-align:center";># Personal statement
-
+# Personal statement
 Arthur Dion
-</p>
 
 ## Comment  j'ai obtenu mes données ?
  J'avais déjà utilisé l'application Quality time sur mon téléphone. Cela était instructif.
