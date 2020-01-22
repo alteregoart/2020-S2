@@ -11,9 +11,20 @@ Enfin j'ai un script pour les afficher et les retravailler.
 
 # Quel forme prend les données ?
 
+Les données sont envoyés sous la forme de JSON. On peut choisir d'avoir deux types d'organisations:
+ - sous forme de rapport (même forme que celle de l'application)
+ - sous forme de déroulé de toutes les activités de la journée
+
+
 # Comment je log les données ? Est-ce facile ? Puis-je le faire pendant une semaine ? 
 
+Le log des données ne peux pas être plus simple. Je n'ai rien à faire. 
+
+
 # Que voulez vous apprendre de ses données, de leurs représentations ou du procédé en général ? 
+
+Je veux voir comment j'utilise mon temps sur mes outils éléctronique et ce que je fais exactement. 
+
 
 # Test sur 2 jours
 
