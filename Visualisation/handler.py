@@ -8,6 +8,7 @@ import pandas
 # In order to charge the data you have to execute the code in the Vizualisation folder
 
 # https://stackoverflow.com/questions/3160699/python-progress-bar
+# quick and dirty progress bar
 def progressbar(it, prefix="", size=60, file=sys.stdout):
     count = len(it)
     def show(j):
@@ -21,13 +22,16 @@ def progressbar(it, prefix="", size=60, file=sys.stdout):
     file.write("\n")
     file.flush()
 
+# load the key from a json
 with open("credential.json", "r") as file:
     KEY = json.load(file)['KEY']
 
+# function to get the activity 
 def get_activity(key,  end_date, begin_date = '2020-01-22', resolution='hour'):
     # date in format YYYY-MM-DD
     try:    
         activities = pandas.read_csv('data/rescuetime-' + begin_date + '-to-' + end_date + '.csv')
+        activities = activities.drop("Unnamed: 0", 1) # remove the index created during the saving
     except:
         print("Unable to find local data on csv, fetching through the API (internet is required)")
 
@@ -43,22 +47,19 @@ def get_activity(key,  end_date, begin_date = '2020-01-22', resolution='hour'):
             'restrict_end': end_date,
             'format':'json', # JSON or csv
         }
-
+        columns = ['Date','Seconds','NumberOfPeople','Activity','Category','Productivity']
         activities_list = []
         # get one day after another
         for i in progressbar(range(delta_time.days + 1), "Fetching", 100):
             current_day = d1 + datetime.timedelta(days=i)
             parameters['restrict_begin'] = str(current_day)
             parameters['restrict_end'] = str(current_day)
-            columns = []
             try:
                 # directly convert the response in json
                 response = requests.get("https://www.rescuetime.com/anapi/data", parameters).json()
-                print(response)
             except:
                 print("Error collecting the data for " + current_day)
             if len(response) != 0 :
-                columns = response['row_headers']
                 for i in response['rows']:
                     activities_list.append(i)
             else: 
@@ -79,3 +80,5 @@ activities = get_activity(key= KEY, begin_date = '2020-01-22', end_date = '2020-
 activities.info()
 activities.describe()
 activities.tail()
+
+print(activities.Seconds.sum()/60/60)
