@@ -3,6 +3,9 @@ import json
 import datetime 
 import sys,os
 import pandas
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import numpy
 
 # This let you download the data and save them on the disk for further use
 # In order to charge the data you have to execute the code in the Vizualisation folder
@@ -81,4 +84,68 @@ activities.info()
 activities.describe()
 activities.tail()
 
-print(activities.Seconds.sum()/60/60)
+activities['Productive'] = activities['Productivity']
+print(activities['Productive'])
+
+activities['Productive'] = activities['Productive'].map({-2: 'très distrayant', 
+                                                        -1: 'distrayant',
+                                                       0: 'Neutre',
+                                                       1: 'Productif',
+                                                       2: 'très productif'})
+
+
+
+activities['Date'] = pandas.to_datetime(activities['Date'])
+
+activities = activities.sort_values(by='Date').reset_index(drop=True)
+
+
+activities['Year'] = activities['Date'].apply(lambda x: x.strftime('%Y'))
+activities['Month'] = activities['Date'].apply(lambda x: x.strftime('%m'))
+activities['Hour'] = activities['Date'].apply(lambda x: x.strftime('%h'))
+activities['Date'] = activities['Date'].apply(lambda x: x.strftime('%Y-%m-%d'))
+
+###Total time per Day
+
+total_computer_time_by_date = activities.groupby(['Date'])['Seconds'].sum().reset_index(name='Seconds')
+total_computer_time_by_date['Minutes'] = round(total_computer_time_by_date['Seconds'] / 60, 2)
+total_computer_time_by_date['Hours'] = round(total_computer_time_by_date['Seconds'] / 60 / 60, 2)
+total_computer_time_by_date.tail()
+
+total_computer_time_by_date = total_computer_time_by_date.drop(['Seconds', 'Minutes'], axis=1)
+total_computer_time_by_date = total_computer_time_by_date.set_index(['Date'])
+
+chart_title = 'Daily Computer Time in Hours for Last 30 Days'
+plt.style.use('seaborn-darkgrid')
+ax = total_computer_time_by_date.tail(30).plot.bar(stacked=True, rot=90, figsize=(12,6), colormap='tab20c', legend=False)
+ax.set_xlabel('')
+ax.set_ylabel('Hours')
+ax.set_title(chart_title)
+#plt.show()
+
+
+
+# total_by_date_productivity
+total_by_date_productivity = activities.groupby(['Date', 'Productive'])['Seconds'].sum().reset_index(name='Seconds')
+total_by_date_productivity['Minutes'] = round((total_by_date_productivity['Seconds'] / 60), 2)
+total_by_date_productivity['Hours'] = round((total_by_date_productivity['Seconds'] / 60 / 60), 2)
+table = total_by_date_productivity.pivot_table(index='Date', columns='Productive', values='Hours', aggfunc=numpy.sum)
+table.to_csv("data/days_productive_time_full.csv")
+
+# process and simplify productivity dimensions
+days_productive_time = table.copy()
+days_productive_time['productive_simple'] = days_productive_time['Productif'] + days_productive_time['très productif']
+days_productive_time.drop(['Productif', 'très productif'], axis=1, inplace=True)
+days_productive_time['distracting_simple'] = days_productive_time['distrayant'] + days_productive_time['très distrayant']
+days_productive_time.drop(['distrayant', 'très distrayant'], axis=1, inplace=True)
+days_productive_time.columns = ['Neutral', 'Productive', 'Distracting']
+
+
+
+chart_title = 'Daily Computer Time Broken Down by Productivity for Last 30 Days'
+plt.style.use('seaborn-darkgrid')
+ax = days_productive_time.tail(30).plot.bar(stacked=True, rot=90, figsize=(12,6))
+ax.set_xlabel('')
+ax.set_ylabel('Hours')
+ax.set_title(chart_title)
+#plt.show()
