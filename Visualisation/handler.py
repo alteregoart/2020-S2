@@ -85,7 +85,7 @@ activities.describe()
 activities.tail()
 
 activities['Productive'] = activities['Productivity']
-print(activities['Productive'])
+print(activities['Productive'].unique())
 
 activities['Productive'] = activities['Productive'].map({-2: 'très distrayant', 
                                                         -1: 'distrayant',
@@ -149,3 +149,11 @@ ax.set_xlabel('')
 ax.set_ylabel('Hours')
 ax.set_title(chart_title)
 #plt.show()
+
+total_time_hours = activities.groupby(['Hour'])
+def heat_map(series, begin_date=None, end_date=None):
+    d1 = datetime.date.fromisoformat(begin_date)
+    d2 = datetime.date.fromisoformat(end_date)
+    delta_time = d2 - d1
+
+heat_map = total_time_hours   
