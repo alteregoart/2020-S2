@@ -6,7 +6,7 @@ import pandas
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib
-import numpy
+import numpy as np
 
 matplotlib.use('TkAgg')
 
@@ -81,7 +81,7 @@ def get_activity(key,  end_date, begin_date = '2020-01-22', resolution='hour'):
 
     return activities
 
-activities = get_activity(key= KEY, begin_date = '2020-01-22', end_date = '2020-01-27', resolution='hour')
+activities = get_activity(key= KEY, begin_date = '2020-01-22', end_date = '2020-02-02', resolution='hour')
 
 #activities.info()
 #activities.describe()
@@ -123,7 +123,7 @@ total_computer_time_by_date = total_computer_time_by_date.drop(['Seconds', 'Minu
 total_computer_time_by_date = total_computer_time_by_date.set_index(['Date'])
 
 chart_title = 'Daily Computer Time in Hours for Last 30 Days'
-plt.style.use('seaborn-darkgrid')
+# plt.style.use('seaborn-darkgrid')
 ax = total_computer_time_by_date.tail(30).plot.bar(stacked=True, rot=90, figsize=(12,6), colormap='tab20c', legend=False)
 ax.set_xlabel('')
 ax.set_ylabel('Hours')
@@ -136,11 +136,11 @@ ax.set_title(chart_title)
 total_by_date_productivity = activities.groupby(['Date', 'Productive'])['Seconds'].sum().reset_index(name='Seconds')
 total_by_date_productivity['Minutes'] = round((total_by_date_productivity['Seconds'] / 60), 2)
 total_by_date_productivity['Hours'] = round((total_by_date_productivity['Seconds'] / 60 / 60), 2)
-table = total_by_date_productivity.pivot_table(index='Date', columns='Productive', values='Hours', aggfunc=numpy.sum)
+table = total_by_date_productivity.pivot_table(index='Date', columns='Productive', values='Hours', aggfunc=np.sum)
 table.to_csv("data/days_productive_time_full.csv")
 
 # process and simplify productivity dimensions
-days_productive_time = table.copy()
+days_productive_time = table.fillna(value=0).copy()
 days_productive_time['productive_simple'] = days_productive_time['Productif'] + days_productive_time['très productif']
 days_productive_time.drop(['Productif', 'très productif'], axis=1, inplace=True)
 days_productive_time['distracting_simple'] = days_productive_time['distrayant'] + days_productive_time['très distrayant']
@@ -150,7 +150,7 @@ days_productive_time.columns = ['Neutral', 'Productive', 'Distracting']
 
 
 chart_title = 'Daily Computer Time Broken Down by Productivity for Last 30 Days'
-plt.style.use('seaborn-darkgrid')
+# plt.style.use('seaborn-darkgrid')
 ax = days_productive_time.tail(30).plot.bar(stacked=True, rot=90, figsize=(12,6))
 ax.set_xlabel('')
 ax.set_ylabel('Hours')
@@ -173,23 +173,49 @@ def heat_map(series, begin_date=None, end_date=None):
     d1 = datetime.date.fromisoformat(begin_date)
     d2 = datetime.date.fromisoformat(end_date)
     delta_time = d2 - d1
-    result = numpy.zero()
+    result = np.zero()
 
-heat_map = total_time_hours   
+set_days = set([x[1].Date for x in total_time_hours.iterrows()])
+n_days = len(set_days)
+x_labels = sorted(list(set_days))
+y_labels = [f"{i:02d}" for i in range(24)]
+heat_map_values = np.zeros((24, n_days))
+
+for i in range(len(x_labels)):
+	for j in range(len(y_labels)):
+		date = x_labels[i]
+		hour = y_labels[j]
+		temp = total_time_hours[total_time_hours["Hour"] == hour]
+		temp = temp[temp["Date"] == date]["Seconds"]
+		if len(temp) == 0:
+			heat_map_values[j, i] = 0
+		else:
+			assert len(temp) == 1, f"More than 1 entry returned ({len(temp)})"
+			heat_map_values[j, i] = temp.iloc(0)[0]
+
+plt.set_cmap("Greys")
+fig, ax = plt.subplots()
+im = ax.imshow(heat_map_values)
+plt.colorbar(im, ax=ax, ticks=range(0, int(np.max(heat_map_values)), int(np.max(heat_map_values / 15))))
 
 
+# We want to show all ticks...
+ax.set_xticks(np.arange(len(x_labels)))
+ax.set_yticks(np.arange(len(y_labels)))
+# ... and label them with the respective list entries
+ax.set_xticklabels(x_labels)
+ax.set_yticklabels(y_labels)
 
+# Rotate the tick labels and set their alignment.
+plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+         rotation_mode="anchor")
 
+# Loop over data dimensions and create text annotations.
+#for i in range(len(y_labels)):
+ #   for j in range(len(x_labels)):
+ #       text = ax.text(j, i, heat_map_values[i, j],
+ #                      ha="center", va="center", color="w")
 
-
-
-
-
-
-
-
-
-
-
-
-
+ax.set_title("Un joli graphique")
+fig.tight_layout()
+plt.show()
