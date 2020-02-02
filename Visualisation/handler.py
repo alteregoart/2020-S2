@@ -5,7 +5,10 @@ import sys,os
 import pandas
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import matplotlib
 import numpy
+
+matplotlib.use('TkAgg')
 
 # This let you download the data and save them on the disk for further use
 # In order to charge the data you have to execute the code in the Vizualisation folder
@@ -80,12 +83,12 @@ def get_activity(key,  end_date, begin_date = '2020-01-22', resolution='hour'):
 
 activities = get_activity(key= KEY, begin_date = '2020-01-22', end_date = '2020-01-27', resolution='hour')
 
-activities.info()
-activities.describe()
-activities.tail()
+#activities.info()
+#activities.describe()
+#activities.tail()
 
 activities['Productive'] = activities['Productivity']
-print(activities['Productive'].unique())
+# print(activities['Productive'].unique())
 
 activities['Productive'] = activities['Productive'].map({-2: 'très distrayant', 
                                                         -1: 'distrayant',
@@ -94,16 +97,20 @@ activities['Productive'] = activities['Productive'].map({-2: 'très distrayant',
                                                        2: 'très productif'})
 
 
+# print(activities.tail())
 
 activities['Date'] = pandas.to_datetime(activities['Date'])
 
 activities = activities.sort_values(by='Date').reset_index(drop=True)
 
-
+activities['DateTime'] = activities['Date']
 activities['Year'] = activities['Date'].apply(lambda x: x.strftime('%Y'))
 activities['Month'] = activities['Date'].apply(lambda x: x.strftime('%m'))
-activities['Hour'] = activities['Date'].apply(lambda x: x.strftime('%h'))
+activities['Hour'] = activities['Date'].apply(lambda x: x.strftime('%H'))
+activities['Minutes'] = activities['Date'].apply(lambda x: x.strftime('%M'))
 activities['Date'] = activities['Date'].apply(lambda x: x.strftime('%Y-%m-%d'))
+
+# print(activities.tail())
 
 ###Total time per Day
 
@@ -122,7 +129,7 @@ ax.set_xlabel('')
 ax.set_ylabel('Hours')
 ax.set_title(chart_title)
 #plt.show()
-
+# plt.savefig("fig.png")
 
 
 # total_by_date_productivity
@@ -150,10 +157,39 @@ ax.set_ylabel('Hours')
 ax.set_title(chart_title)
 #plt.show()
 
-total_time_hours = activities.groupby(['Hour'])
+activities.info()
+print(activities.tail())
+
+total_time_hours = activities.groupby(['Hour','Date'])['Seconds'].sum().reset_index()
+#total_time_hours = 
+print("patate")
+print(total_time_hours)
+#total_time_hours_resample = activities.resample('H','columns' )
+print("patate2")
+# print(total_time_hours["Seconds"].get_group(("00", "2020-01-25")).sum())
+
+
 def heat_map(series, begin_date=None, end_date=None):
     d1 = datetime.date.fromisoformat(begin_date)
     d2 = datetime.date.fromisoformat(end_date)
     delta_time = d2 - d1
+    result = numpy.zero()
 
 heat_map = total_time_hours   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
