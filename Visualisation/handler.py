@@ -162,10 +162,8 @@ print(activities.tail())
 
 total_time_hours = activities.groupby(['Hour','Date'])['Seconds'].sum().reset_index()
 #total_time_hours = 
-print("patate")
-print(total_time_hours)
+#print(total_time_hours)
 #total_time_hours_resample = activities.resample('H','columns' )
-print("patate2")
 # print(total_time_hours["Seconds"].get_group(("00", "2020-01-25")).sum())
 
 
@@ -193,6 +191,10 @@ for i in range(len(x_labels)):
 			assert len(temp) == 1, f"More than 1 entry returned ({len(temp)})"
 			heat_map_values[j, i] = temp.iloc(0)[0]
 
+# change the representation to start the day at 6pm
+heat_map_values = np.vstack((heat_map_values[6:], heat_map_values[:6]))
+heat_map_values = np.round(heat_map_values/60)
+
 plt.set_cmap("Greys")
 fig, ax = plt.subplots()
 im = ax.imshow(heat_map_values)
@@ -204,7 +206,7 @@ ax.set_xticks(np.arange(len(x_labels)))
 ax.set_yticks(np.arange(len(y_labels)))
 # ... and label them with the respective list entries
 ax.set_xticklabels(x_labels)
-ax.set_yticklabels(y_labels)
+ax.set_yticklabels(y_labels[6:] + y_labels[:6])
 
 # Rotate the tick labels and set their alignment.
 plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
