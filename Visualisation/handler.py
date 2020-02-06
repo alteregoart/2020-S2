@@ -81,7 +81,7 @@ def get_activity(key,  end_date, begin_date = '2020-01-22', resolution='hour'):
 
     return activities
 
-activities = get_activity(key= KEY, begin_date = '2020-01-22', end_date = '2020-02-02', resolution='hour')
+activities = get_activity(key= KEY, begin_date = '2020-01-22', end_date = '2020-02-05', resolution='hour')
 
 #activities.info()
 #activities.describe()
@@ -157,8 +157,8 @@ ax.set_ylabel('Hours')
 ax.set_title(chart_title)
 #plt.show()
 
-activities.info()
-print(activities.tail())
+#activities.info()
+#print(activities.tail())
 
 total_time_hours = activities.groupby(['Hour','Date'])['Seconds'].sum().reset_index()
 #total_time_hours = 
@@ -218,6 +218,6 @@ plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
  #       text = ax.text(j, i, heat_map_values[i, j],
  #                      ha="center", va="center", color="w")
 
-ax.set_title("Un joli graphique")
+ax.set_title("Heatmap: hour representation of day")
 fig.tight_layout()
 plt.show()
