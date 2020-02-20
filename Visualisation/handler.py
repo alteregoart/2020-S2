@@ -32,8 +32,9 @@ def progressbar(it, prefix="", size=60, file=sys.stdout):
     file.flush()
 
 # function to get the activity 
-def get_activity(end_date, begin_date = '2020-01-22', resolution='hour'):
+def get_activity(end_date, begin_date, resolution='hour'):
     # date in format YYYY-MM-DD
+    print(f"Get the date from {begin_date} to {end_date}")
     try:    
         activities = pandas.read_csv('data/rescuetime-' + begin_date + '-to-' + end_date + '.csv')
         activities = activities.drop("Unnamed: 0", 1) # remove the index created during the saving
@@ -49,7 +50,7 @@ def get_activity(end_date, begin_date = '2020-01-22', resolution='hour'):
         delta_time = d2 - d1
 
         parameters = {
-            'key': key,
+            'key': KEY,
             'perspective':'interval',
             'resolution_time': resolution,
             'restrict_begin': begin_date,
@@ -108,7 +109,6 @@ def get_activity(end_date, begin_date = '2020-01-22', resolution='hour'):
     activities['Date'] = activities['Date'].apply(lambda x: x.strftime('%Y-%m-%d'))
     return activities
 
-activities = get_activity(begin_date = '2020-01-22', end_date = '2020-02-19', resolution='hour')
 
 
 
@@ -264,14 +264,20 @@ def app_by_time(activities, nb_of_activity=10, save=False):
 
 # https://docs.python.org/fr/3/howto/argparse.html
 parser = argparse.ArgumentParser(
-description='A simple rescueTime analyzer')
+description='A simple rescueTime analyzer because I can do it')
 # add optionnal arguments
 parser.add_argument("-s", "--save", help="save the figures", action="store_true")
+parser.add_argument("-b","--begin", help="the date to start the analyze format expected: YYYY-MM-DD", default="2020-01-22")
+parser.add_argument("-e","--end", help="the date to end the analyze format expected: YYYY-MM-DD", default="2020-02-19")
 #get the arguments
 args = parser.parse_args()
 if args.save:
     print("save OK")
     save = True 
+
+
+
+activities = get_activity(begin_date = args.begin, end_date = args.end)
 total_time_per_day(activities,nb_of_day=30, save=save)
 productivity_per_day(activities,nb_of_day=30, save=save)
 heat_map_activity_per_hours(activities, save=save)
