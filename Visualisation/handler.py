@@ -7,9 +7,11 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib
 import numpy as np
+import argparse
+
 
 matplotlib.use('TkAgg')
-
+save=False
 
 # This let you download the data and save them on the disk for further use
 # In order to charge the data you have to execute the code in the Vizualisation folder
@@ -113,7 +115,7 @@ activities = get_activity(begin_date = '2020-01-22', end_date = '2020-02-19', re
 # print(activities.tail())
 
 ###Total time per day
-def total_time_per_day(activities, nb_of_day=30):
+def total_time_per_day(activities, nb_of_day=30, save=False):
     total_computer_time_by_date = activities.groupby(['Date'])['Seconds'].sum().reset_index(name='Seconds')
     total_computer_time_by_date['Minutes'] = round(total_computer_time_by_date['Seconds'] / 60, 2)
     total_computer_time_by_date['Hours'] = round(total_computer_time_by_date['Seconds'] / 60 / 60, 2)
@@ -128,12 +130,14 @@ def total_time_per_day(activities, nb_of_day=30):
     ax.set_xlabel('')
     ax.set_ylabel('Hours')
     ax.set_title(chart_title)
+    if save:
+        plt.savefig("Daily_computer_time", transparent=True)
     plt.show()
 
 
 
 ### Total productivity per day
-def productivity_per_day(activities, nb_of_day=30):
+def productivity_per_day(activities, nb_of_day=30, save=False):
     total_by_date_productivity = activities.groupby(['Date', 'Productive'])['Seconds'].sum().reset_index(name='Seconds')
     total_by_date_productivity['Minutes'] = round((total_by_date_productivity['Seconds'] / 60), 2)
     total_by_date_productivity['Hours'] = round((total_by_date_productivity['Seconds'] / 60 / 60), 2)
@@ -154,10 +158,12 @@ def productivity_per_day(activities, nb_of_day=30):
     ax.set_xlabel('')
     ax.set_ylabel('Hours')
     ax.set_title(chart_title)
+    if save:
+        plt.savefig("Productivity_per_day", transparent=True)
     plt.show()
 
 
-def heat_map_activity_per_hours(activities):
+def heat_map_activity_per_hours(activities, save=False):
     total_time_hours = activities.groupby(['Hour','Date'])['Seconds'].sum().reset_index()
 
     def heat_map(series, begin_date=None, end_date=None):
@@ -213,9 +219,11 @@ def heat_map_activity_per_hours(activities):
 
     ax.set_title("Heatmap: hour representation of day")
     fig.tight_layout()
+    if save:
+        plt.savefig("Heatmap_per_hour", transparent=True)
     plt.show()
 
-def category_by_time(activities, nb_of_activity=10):
+def category_by_time(activities, nb_of_activity=10, save=False):
     categories = activities.pivot_table(index=['Category'], values='Seconds', aggfunc=np.sum).sort_values(by='Seconds', ascending=False)
     categories['Hours'] = round(categories['Seconds'] / 60 / 60, 1)
 
@@ -230,9 +238,11 @@ def category_by_time(activities, nb_of_activity=10):
     ax.set_xlabel('')
 
     ax.set_title(chart_title)
+    if save:
+        plt.savefig("Category_by_time", transparent=True)
     plt.show()
 
-def app_by_time(activities, nb_of_activity=10):
+def app_by_time(activities, nb_of_activity=10, save=False):
     # activity
     apps = activities.pivot_table(index=['Activity'], values='Seconds', aggfunc=np.sum).sort_values(by='Seconds', ascending=False)
     apps['Hours'] = round(apps['Seconds'] / 60 / 60, 1)
@@ -248,11 +258,22 @@ def app_by_time(activities, nb_of_activity=10):
     ax.set_xlabel('')
 
     ax.set_title(chart_title)
+    if save:
+        plt.savefig("Application_by_time", transparent=True)
     plt.show()
 
-
-total_time_per_day(activities,nb_of_day=30)
-productivity_per_day(activities,nb_of_day=30)
-heat_map_activity_per_hours(activities)
-category_by_time(activities, nb_of_activity=10)
-app_by_time(activities, nb_of_activity= 15)
+# https://docs.python.org/fr/3/howto/argparse.html
+parser = argparse.ArgumentParser(
+description='A simple rescueTime analyzer')
+# add optionnal arguments
+parser.add_argument("-s", "--save", help="save the figures", action="store_true")
+#get the arguments
+args = parser.parse_args()
+if args.save:
+    print("save OK")
+    save = True 
+total_time_per_day(activities,nb_of_day=30, save=save)
+productivity_per_day(activities,nb_of_day=30, save=save)
+heat_map_activity_per_hours(activities, save=save)
+category_by_time(activities, nb_of_activity=10, save=save)
+app_by_time(activities, nb_of_activity= 15, save=save)
