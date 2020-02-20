@@ -11,11 +11,6 @@ import numpy as np
 matplotlib.use('TkAgg')
 
 
-
-
-
-
-
 # This let you download the data and save them on the disk for further use
 # In order to charge the data you have to execute the code in the Vizualisation folder
 
@@ -34,18 +29,18 @@ def progressbar(it, prefix="", size=60, file=sys.stdout):
     file.write("\n")
     file.flush()
 
-# load the key from a json
-with open("credential.json", "r") as file:
-    KEY = json.load(file)['KEY']
-
 # function to get the activity 
-def get_activity(key,  end_date, begin_date = '2020-01-22', resolution='hour'):
+def get_activity(end_date, begin_date = '2020-01-22', resolution='hour'):
     # date in format YYYY-MM-DD
     try:    
         activities = pandas.read_csv('data/rescuetime-' + begin_date + '-to-' + end_date + '.csv')
         activities = activities.drop("Unnamed: 0", 1) # remove the index created during the saving
     except:
         print("Unable to find local data on csv, fetching through the API (internet is required)")
+
+        # load the key from a json
+        with open("credential.json", "r") as file:
+            KEY = json.load(file)['KEY']
 
         d1 = datetime.date.fromisoformat(begin_date)
         d2 = datetime.date.fromisoformat(end_date)
@@ -111,14 +106,14 @@ def get_activity(key,  end_date, begin_date = '2020-01-22', resolution='hour'):
     activities['Date'] = activities['Date'].apply(lambda x: x.strftime('%Y-%m-%d'))
     return activities
 
-activities = get_activity(key= KEY, begin_date = '2020-01-22', end_date = '2020-02-13', resolution='hour')
+activities = get_activity(begin_date = '2020-01-22', end_date = '2020-02-19', resolution='hour')
 
 
 
 # print(activities.tail())
 
 ###Total time per day
-def total_time_per_day(nb_of_day=30):
+def total_time_per_day(activities, nb_of_day=30):
     total_computer_time_by_date = activities.groupby(['Date'])['Seconds'].sum().reset_index(name='Seconds')
     total_computer_time_by_date['Minutes'] = round(total_computer_time_by_date['Seconds'] / 60, 2)
     total_computer_time_by_date['Hours'] = round(total_computer_time_by_date['Seconds'] / 60 / 60, 2)
@@ -138,7 +133,7 @@ def total_time_per_day(nb_of_day=30):
 
 
 ### Total productivity per day
-def productivity_per_day(nb_of_day=30):
+def productivity_per_day(activities, nb_of_day=30):
     total_by_date_productivity = activities.groupby(['Date', 'Productive'])['Seconds'].sum().reset_index(name='Seconds')
     total_by_date_productivity['Minutes'] = round((total_by_date_productivity['Seconds'] / 60), 2)
     total_by_date_productivity['Hours'] = round((total_by_date_productivity['Seconds'] / 60 / 60), 2)
@@ -162,7 +157,7 @@ def productivity_per_day(nb_of_day=30):
     plt.show()
 
 
-def heat_map_activity_per_hours():
+def heat_map_activity_per_hours(activities):
     total_time_hours = activities.groupby(['Hour','Date'])['Seconds'].sum().reset_index()
 
     def heat_map(series, begin_date=None, end_date=None):
@@ -221,7 +216,7 @@ def heat_map_activity_per_hours():
     plt.show()
 #plt.show()
 
-def category_by_time(nb_of_activity=10):
+def category_by_time(activities, nb_of_activity=10):
     categories = activities.pivot_table(index=['Category'], values='Seconds', aggfunc=np.sum).sort_values(by='Seconds', ascending=False)
     categories['Hours'] = round(categories['Seconds'] / 60 / 60, 1)
 
@@ -238,7 +233,7 @@ def category_by_time(nb_of_activity=10):
     ax.set_title(chart_title)
     plt.show()
 
-def app_by_time(nb_of_activity=10):
+def app_by_time(activities, nb_of_activity=10):
     # activity
     apps = activities.pivot_table(index=['Activity'], values='Seconds', aggfunc=np.sum).sort_values(by='Seconds', ascending=False)
     apps['Hours'] = round(apps['Seconds'] / 60 / 60, 1)
@@ -257,8 +252,8 @@ def app_by_time(nb_of_activity=10):
     plt.show()
 
 
-#total_time_per_day(30)
-#productivity_per_day(nb_of_day=30)
-#heat_map_activity_per_hours()
-#category_by_time(nb_of_activity=10)
-app_by_time(nb_of_activity= 15)
+total_time_per_day(activities,nb_of_day=30)
+productivity_per_day(activities,nb_of_day=30)
+heat_map_activity_per_hours(activities)
+category_by_time(activities, nb_of_activity=10)
+app_by_time(activities, nb_of_activity= 15)
