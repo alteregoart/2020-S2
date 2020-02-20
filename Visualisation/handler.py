@@ -214,7 +214,6 @@ def heat_map_activity_per_hours(activities):
     ax.set_title("Heatmap: hour representation of day")
     fig.tight_layout()
     plt.show()
-#plt.show()
 
 def category_by_time(activities, nb_of_activity=10):
     categories = activities.pivot_table(index=['Category'], values='Seconds', aggfunc=np.sum).sort_values(by='Seconds', ascending=False)
@@ -241,7 +240,7 @@ def app_by_time(activities, nb_of_activity=10):
 
     # Chart Project Time 
     dataset = apps.head(nb_of_activity)
-    chart_title = 'Category Time Breakdown'
+    chart_title = 'Application Time Breakdown'
 
     plt.style.use('seaborn-darkgrid')
     ax = dataset.plot.bar(y='Hours', figsize=(15, 3), rot=90, colormap='plasma', legend=False)
