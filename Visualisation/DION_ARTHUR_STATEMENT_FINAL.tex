@@ -1,0 +1,91 @@
+\documentclass{article}
+    % General document formatting
+    \usepackage[margin=0.7in]{geometry}
+    \usepackage[parfill]{parskip}
+    \usepackage[utf8]{inputenc}
+    
+    % Related to math
+    \usepackage{amsmath,amssymb,amsfonts,amsthm}
+
+\begin{document}
+\title{Personal statement}
+\author{Arthur Dion}
+\date{}
+\maketitle
+
+
+\section*{Comment  j'ai obtenu mes données ?}
+ J'avais déjà utilisé l'application {\em Quality Time} sur mon téléphone. C'était instructif sur mon usage mais dans le cadre de ce cours cela ne correspondait pas car il n'y avait pas l'option d'exportation. J'ai alors choisi de rechercher une autre application.
+
+J'ai trouvé l'application { \em Moment} mais cette application a 2 défauts majeurs : 
+\begin{itemize}
+\item Compte du temps erroné. C'est assez génant pour une application devant traquer le moindre de mes activités
+\item export impossible
+\end{itemize}
+
+
+Je me suis alors remis à la recherche d'une autre solution. J'ai fini par trouver une nouvelle application. { \em RescueTime}, nouveau problème il n'y avait pas d'option d'exportation mais en cherchant un peu il s'avère que l'API est accessible et permet de récupérer toutes les données même sur la version non payante. Alors oui, je ne peux pas exporter directement
+mais vu que je peux y avoir accès plutôt facilement aucune difficulté.
+
+
+
+\section*{Quel forme prend les données ?}
+
+Les données sont envoyées sous la forme de JSON. On peut choisir d'avoir deux types d'organisations:
+\begin{itemize}
+ \item sous forme de rapport (même forme que celle de l'application)
+ \item sous forme de déroulé de toutes les activités de la journée (ce que j'ai choisi d'utiliser)
+\end{itemize}
+
+
+ Chaque ligne possède comme attribut : 
+ \begin{itemize}
+  \item  Date
+ \item Seconds
+ \item NumberOfPeople
+ \item Activity
+ \item Category
+ \item Productivity
+\end{itemize}  
+
+
+ NumberOfPeople est une information assez inutile qui peut être utilisé dans le cas d'une analyse avec plusieurs utilisateurs (cela nécessite la version pro et d'être dans une entreprise)
+
+
+\section*{Comment je log les données ? Est-ce facile ? Puis-je le faire pendant une semaine ? }
+
+Le log des données ne peux pas être plus simple. Je n'ai rien à faire. (L'installation complète sur tous mes appareils a pris un peu de temps mais c'est tout).
+J'ai une journée qui n'a pas été log. En effet pour activer { \em RescueTime} sur un de mes ordinateurs il faut ouvrir l'application et j'ai oublié de le faire.
+
+
+\section*{Que voulez vous apprendre de ses données, de leurs représentations ou du procédé en général ? }
+
+Je veux voir comment j'utilise mon temps sur mes outils électronique et ce que je fais exactement. 
+
+\section*{Retour d'expérience}
+
+J'ai 28 jours de log ce qui est déjà pas mal je trouve. Je me suis rendu compte que je pouvais passer beaucoup de temps à faire des choses assez inutile.
+Par exemple sur ces 28 jours, j'ai passé 17h à jouer à un jeu sur téléphone. C'est un peu beaucoup je trouve.
+L'avantage de cette solution est que j'ai ainsi pu voir le temps que j'ai passé sur quelques projets. 
+
+
+\section*{Limite de cette solution de tracking seule}
+\begin{enumerate}
+\item Je ne vois pas exactement sur quel projet je travaille vu que j'utilise les mêmes outils pour des projets différents
+\item je vois c'est que cela enregistre le temps que je passe sur mes outils électroniques et ce que je fais dessus. 
+Néanmoins le temps que je passe sur chaque application n'a pas la même valeur.
+\item le track sur mon téléphone n'est pas précis à 100%. 
+Notamment cela n'enregistre pas mon temps d'écoute deezer alors que je passe pas mal de temps à écouter de la musique pendant mes déplacements.
+\item  cela n'enregistre pas mon activité de visionnage de la télévision.
+Or je suis un gros consommateur de contenu (aussi bien série que film) pouvoir tracké cette activité aurait été intéressante. 
+(J'ai exporter mon utilisation de netflix mais les informations qui sont conservées sont assez faible (uniquement titre et date) alors que NetFlix doit avoir le temps exacte de visionnage (avec notamment le fait que l'on finisse ou pas l'épisode ou la série))
+\item le track est uniquement mon activité sur mes devices numériques mais pas ma vie de manière générale, et cette expérience ma donné envie de tracker ce que je fais de manière générale.
+\end{enumerate}
+
+
+Mon prochain objectif sera de tracker mes pas, mon alimentation et mes déplacements (avec tous les moyens de transport) 
+
+
+
+
+\end{document}
